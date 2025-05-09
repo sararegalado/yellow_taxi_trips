@@ -4,11 +4,13 @@ from pyspark.sql.types import DoubleType
 from pyspark.ml.feature import StringIndexer, VectorAssembler
 from pyspark.ml import Pipeline
 
-def create_spark_session(app_name="NYC Taxi Analysis"):
-    spark = SparkSession.builder.appName(app_name).getOrCreate()
+def create_spark_session(app_name="NYC Taxi Preprocessing"):
+    spark = SparkSession.builder \
+        .appName(app_name).getOrCreate()
     return spark
 
 def load_data(spark, path, file_format):
+    print(f"Loading data from {path}")
     if file_format == "csv":
         df = spark.read.csv(path, header=True, inferSchema=True)
     else:
@@ -17,6 +19,7 @@ def load_data(spark, path, file_format):
 
 #Preprocess taxi trip data: extract time-based features, trip duration and speed.
 def preprocess_data(taxi_trips_df):
+    print("Preprocessing taxi trips data...")
 
     taxi_trips_df = taxi_trips_df.filter(F.col("tpep_dropoff_datetime") > F.col("tpep_pickup_datetime")) \
         .withColumn("hour", F.hour("tpep_pickup_datetime")) \
@@ -59,19 +62,25 @@ def join_with_zones(df, zones_df):
 if __name__ == "__main__":
     spark = create_spark_session()
 
-    # Example: Load CSV trip data
-    trips_df = load_data(spark, "data/yellow_tripdata_2024-02.parquet", file_format="parquet")
+    # HDFS paths
+    trips_path = "hdfs:///user/ec2-user/data/yellow_tripdata_2024-02.parquet"
+    zones_path = "hdfs:///user/ec2-user/data/taxi_zone_lookup.csv"
+    output_path = "hdfs:///user/ec2-user/data/processed.parquet"
+
+
+    trips_df = load_data(spark, trips_path, file_format="parquet")
+    zones_df = load_data(spark, zones_path, file_format="csv")
+
+    # Preprocess and join
     trips_df = preprocess_data(trips_df)
+    final_df = join_with_zones(trips_df, zones_df)
 
-    # Load Parquet taxi zone lookup
-    zones_df = load_data(spark, "data/taxi_zone_lookup.csv", file_format="csv")
-
-    # Join with zones
-    df = join_with_zones(trips_df, zones_df)
-    df.write.mode("overwrite").parquet("data/full_tripdata.parquet")
+    # Write output
+    print(f"Writing result to: {output_path}")
+    final_df.write.mode("overwrite").parquet(output_path)
 
 
-
+    print("Preprocessing complete.")
     spark.stop()
 
 
