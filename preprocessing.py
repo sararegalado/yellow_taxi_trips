@@ -21,10 +21,6 @@ def preprocess_data(taxi_trips_df):
     taxi_trips_df = taxi_trips_df.filter(F.col("tpep_dropoff_datetime") > F.col("tpep_pickup_datetime")) \
         .withColumn("hour", F.hour("tpep_pickup_datetime")) \
         .withColumn("day_of_week", F.dayofweek("tpep_pickup_datetime")) \
-        .withColumn("trip_duration_seconds",
-               (F.unix_timestamp("tpep_dropoff_datetime") - F.unix_timestamp("tpep_pickup_datetime")).cast(DoubleType())) \
-        .withColumn("speed_mph",
-               F.when(F.col("trip_duration_seconds") > 0, F.col("trip_distance") / (F.col("trip_duration_seconds") / 3600)).otherwise(0.0)) \
         .withColumn("extras", F.expr("extra + mta_tax + tolls_amount + improvement_surcharge + congestion_surcharge + airport_fee"))
     
 
@@ -72,7 +68,7 @@ if __name__ == "__main__":
 
     # Join with zones
     df = join_with_zones(trips_df, zones_df)
-    df.write.mode("overwrite").csv("data/full_tripdata.parquet")
+    df.write.mode("overwrite").parquet("data/full_tripdata.parquet")
 
 
 
