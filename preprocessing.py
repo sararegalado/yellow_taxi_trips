@@ -63,9 +63,9 @@ if __name__ == "__main__":
     spark = create_spark_session()
 
     # HDFS paths
-    trips_path = "hdfs:///user/ec2-user/data/yellow_tripdata_2024-02.parquet"
-    zones_path = "hdfs:///user/ec2-user/data/taxi_zone_lookup.csv"
-    output_path = "hdfs:///user/ec2-user/data/processed.parquet"
+    trips_path = "hdfs:///taxi_trips/data/yellow_tripdata_2024-02.parquet"
+    zones_path = "hdfs:///taxi_trips/data/taxi_zone_lookup.csv"
+    output_path = "hdfs:///taxi_trips/data/processed.parquet"
 
 
     trips_df = load_data(spark, trips_path, file_format="parquet")
