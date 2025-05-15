@@ -82,8 +82,8 @@ if __name__ == "__main__":
     spark = create_spark_session()
 
     # Input and output paths in HDFS
-    input_path = "hdfs:///taxi_trips/data/processed.parquet"
-    output_base = "hdfs:///taxi_trips/output/"
+    input_path = "/taxi_trips/data/processed.parquet"
+    output_base = "/taxi_trips/output/"
 
     df = load_data(spark, input_path)
 
