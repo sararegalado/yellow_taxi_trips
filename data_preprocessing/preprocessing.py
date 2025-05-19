@@ -37,7 +37,7 @@ def preprocess_data(taxi_trips_df):
 def join_with_zones(df, zones_df):
     df = df.join(
         zones_df
-            .select("LocationID", "Borough", "Zone")  # Solo las columnas necesarias
+            .select("LocationID", "Borough", "Zone")
             .withColumnRenamed("LocationID", "PULocationID")
             .withColumnRenamed("Borough", "PU_Borough")
             .withColumnRenamed("Zone", "PU_Zone"),
@@ -63,9 +63,9 @@ if __name__ == "__main__":
     spark = create_spark_session()
 
     # HDFS paths
-    trips_path = "/taxi_trips/data/yellow_tripdata_2024-02.parquet"
-    zones_path = "/taxi_trips/data/taxi_zone_lookup.csv"
-    output_path = "/taxi_trips/data/processed.parquet"
+    trips_path = "/NY_taxi_trips/data/raw/yellow_tripdata_2024-02.parquet"
+    zones_path = "/NY_taxi_trips/data/raw/taxi_zone_lookup.csv"
+    output_path = "/NY_taxi_trips/data/processed.parquet"
 
 
     trips_df = load_data(spark, trips_path, file_format="parquet")

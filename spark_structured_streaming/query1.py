@@ -42,16 +42,14 @@ def kafkasetup():
 
 parsed = kafkasetup()
 
-# Filtrar por categoría finance y aplicar ventana
+# Filter by category "finance"
 finance_events = parsed.filter(col("category") == "finance")
 
-# Agrupar por ventana de 15 minutos y país
+# Group by location to show different countries
 finance_windowed = finance_events \
-    .withWatermark("timestamp", "10 minutes") \
     .groupBy(window(col("timestamp"), "15 minutes"), col("location")) \
     .count()
 
-# Ordenar por conteo descendente (Spark mostrará todo, puedes cortar visualmente el top 10)
 ordered = finance_windowed.orderBy(desc("count"))
 
 

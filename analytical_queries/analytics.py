@@ -32,7 +32,7 @@ def most_frequent_pickup_dropoff_pairs(df, output_path):
 
     result.write.mode("overwrite").parquet(output_path)
 
-# Average speed per trip
+# Average speed per trip (top20)
 def average_speed(df, output_path):
     df = df.withColumn("trip_duration_hours", 
                        (F.unix_timestamp("tpep_dropoff_datetime") - F.unix_timestamp("tpep_pickup_datetime")) / 3600.0)
@@ -49,7 +49,7 @@ def average_speed(df, output_path):
 
     result.write.mode("overwrite").parquet(output_path)
 
-# Average tip by hour
+# Average tip by hour (top20)
 def average_tip_by_hour(df, output_path):
     result = df.groupBy("hour") \
                .agg(F.avg("tip_amount").alias("average_tip")) \
@@ -58,7 +58,7 @@ def average_tip_by_hour(df, output_path):
 
     result.write.mode("overwrite").parquet(output_path)
 
-# Number of trips by day of week and hour
+# Number of trips by day of week and hour (top20)
 def trips_by_day_hour(df, output_path):
     df = df.withColumn("day_name", F.when(df["day_of_week"] == 1, "Monday")
                                      .when(df["day_of_week"] == 2, "Tuesday")
@@ -82,8 +82,8 @@ if __name__ == "__main__":
     spark = create_spark_session()
 
     # Input and output paths in HDFS
-    input_path = "/taxi_trips/data/processed.parquet"
-    output_base = "/taxi_trips/output/"
+    input_path = "/NY_taxi_trips/data/processed.parquet"
+    output_base = "/NY_taxi_trips/analytical_queries/output/"
 
     df = load_data(spark, input_path)
 

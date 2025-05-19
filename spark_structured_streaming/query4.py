@@ -41,10 +41,10 @@ result = parsed \
     .groupBy(window(col("timestamp"), "10 minutes"), col("article_id").alias("articles_with_spike_in_views")) \
     .count()
 
-filtered = result.filter(col("count") >= 250)
+filtered = result.filter(col("count") > 250)
 
 
-query = result.writeStream \
+query = filtered.writeStream \
     .outputMode("complete") \
     .format("console") \
     .option("truncate", False) \
